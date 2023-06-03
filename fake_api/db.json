@@ -1,5 +1,50 @@
 {
-  "products": [],
+  "products": [
+    {
+      "name": "dupa2",
+      "description": "blada",
+      "price": 10,
+      "image": "",
+      "stockCount": 2,
+      "barcode": "1111",
+      "category": 1,
+      "subcategory": 2,
+      "id": 1
+    },
+    {
+      "name": "dupa",
+      "description": "jasna",
+      "price": 2,
+      "image": "",
+      "stockCount": 1,
+      "barcode": "2222",
+      "category": 3,
+      "subcategory": 8,
+      "id": 2
+    },
+    {
+      "name": "dupa",
+      "description": "jasna",
+      "price": 2,
+      "image": "",
+      "stockCount": 1,
+      "barcode": "2222",
+      "category": 3,
+      "subcategory": 8,
+      "id": 3
+    },
+    {
+      "name": "dupa",
+      "description": "jasna",
+      "price": 2,
+      "image": "",
+      "stockCount": 1,
+      "barcode": "2222",
+      "category": 3,
+      "subcategory": 8,
+      "id": 4
+    }
+  ],
   "categories": [
     {
       "id": 1,

@@ -1,6 +1,7 @@
 import {useFormik} from 'formik';
 import Grid from '@mui/material/Unstable_Grid2';
 import {
+    Alert,
     Box,
     Button,
     FormControl,
@@ -11,6 +12,7 @@ import {
 } from '@mui/material';
 import DropInput from '../DropInput/DropInput';
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 // [{id, category, subcategory: [{id, name}]}]
 
@@ -30,6 +32,21 @@ interface Category extends Kind {
 
 interface CategoryApi extends Kind {
     subcategories: number[];
+}
+
+interface Product {
+    "name": string;
+    "description": string;
+    "price": number;
+    "image": string;
+    "stockCount": number;
+    "barcode": string;
+    "category": number;
+    "subcategory": number;
+}
+
+type ProductId = {
+    id: number;
 }
 
 async function getKind<T>(endpoint: string): Promise<T[]> {
@@ -54,15 +71,55 @@ async function getCategoriesWithSubcategories(): Promise<Category[]> {
     }))
 }
 
+async function addProduct(endpoint: string, product: Product): Promise<Product & ProductId> {
+    const response = await fetch(`/api/v1/${endpoint}`, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(product)
+    })
+
+    return response.json();
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+function delay(timer: number, fn: Function, ...args: any[]): Promise<number> {
+    return new Promise((resolve) => {
+        const interval = setTimeout(() => {
+            fn(...args)
+        }, timer);
+        resolve(interval);
+    })
+}
 
 function ProductForm() {
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 
+    const [isMessage, setIsMessage] = useState(false);
+    const [productId, setProductId] = useState<number | undefined>(undefined);
+
+    const navigate = useNavigate();
+
     useEffect(() => {
         getCategoriesWithSubcategories().then(setCategories);
     }, [])
+
+    useEffect(() => {
+        let intervalId: number | undefined;
+
+        if (isMessage) {
+            delay(5000, navigate, `/products/${productId}`)
+                .then((interval) => {
+                    intervalId = interval;
+                })
+        }
+        return () => {
+            clearInterval(intervalId);
+        }
+    },[isMessage, navigate, productId])
 
     const formik = useFormik({
         initialValues: {
@@ -72,17 +129,23 @@ function ProductForm() {
             image: '',
             stockCount: 0,
             barcode: '',
-            category: '0',
-            subCategory: '0',
+            category: 0,
+            subcategory: 0
         },
-        onSubmit: (values) => {
-            alert(JSON.stringify(values, null, 2));
+        onSubmit: async (values) => {
+            const product = await addProduct('products', values);
+            setIsMessage(true);
+            setProductId(product.id)
         },
     });
 
-    function updateSubcategories(selectedCategory: string) {
+    function updateSubcategories(selectedCategory: number) {
+        if (selectedCategory === 0) {
+            setSubcategories([]);
+        }
+
         const selectedCategoryObj = categories
-            .find((category) => category.id === parseInt(selectedCategory));
+            .find((category) => category.id === selectedCategory);
 
         if (selectedCategoryObj !== undefined) {
             const subcategoriesFiltered = selectedCategoryObj.subcategories.filter(Boolean) as Subcategory[];
@@ -94,6 +157,9 @@ function ProductForm() {
 
     return (
         <Box sx={{my: '20px'}}>
+            {isMessage && (
+                <Alert severity="success" sx={{mb: '20px'}}>Product has been added.</Alert>
+            )}
             <form onSubmit={formik.handleSubmit}>
                 <Grid spacing={2} container>
                     <Grid xs={12}>
@@ -164,10 +230,10 @@ function ProductForm() {
                                 onChange={(e) => {
                                     formik.handleChange(e);
                                     updateSubcategories(e.target.value);
-                                    formik.values.subcategory = "0";
+                                    formik.values.subcategory = 0;
                                 }}
                             >
-                                <MenuItem value="0">---</MenuItem>
+                                <MenuItem value={0}>---</MenuItem>
                                 {categories.map((category) => (
                                     <MenuItem
                                         value={category.id}
@@ -181,18 +247,19 @@ function ProductForm() {
                     </Grid>
                     <Grid xs={12}>
                         <FormControl fullWidth>
-                            <InputLabel id="categoryLbl">
+                            <InputLabel id="subcategoryLbl">
                                 Sub Category
                             </InputLabel>
                             <Select
-                                labelId="subCategoryLbl"
-                                id="subCategory"
-                                name="subCategory"
-                                value={formik.values.subCategory}
+                                labelId="subcategoryLbl"
+                                id="subcategory"
+                                name="subcategory"
+                                value={formik.values.subcategory}
                                 label="Sub Category"
                                 onChange={formik.handleChange}
+                                disabled={!subcategories.length}
                             >
-                                <MenuItem value="0">---</MenuItem>
+                                <MenuItem value={0}>---</MenuItem>
                                 {subcategories.map((subcategory) => (
                                     <MenuItem
                                         value={subcategory.id}
