@@ -50,6 +50,9 @@ function DropInput() {
 
     return (
         <div className="container">
+            {/*TODO: generate typing for all css attrs*/}
+            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+            {/* @ts-ignore */}
             <div {...getRootProps({ style })}>
                 <input {...getInputProps()} />
                 <p>Drag 'n' drop some files here, or click to select files</p>
