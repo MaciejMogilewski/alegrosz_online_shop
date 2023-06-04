@@ -1,6 +1,17 @@
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import {Alert, Button, Card, CardActions, CardContent, CardMedia, Chip, Typography} from "@mui/material";
+import {
+    Alert,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    CardMedia,
+    Chip,
+    FormControl,
+    InputLabel, MenuItem, Select,
+    Typography
+} from "@mui/material";
 import {useLocation} from "react-router-dom"
 import {useEffect, useState} from "react";
 import {Product, ProductWithCategories} from "../types/product";
@@ -46,6 +57,7 @@ async function getProductsWithCategories(signal: AbortSignal): Promise<ProductWi
 function HomePage() {
     const [products, setProducts] = useState<ProductWithCategories[]>([]);
     const [query, setQuery] = useState('');
+    const [sortParam, setSortParam] = useState<string>('');
     const location = useLocation();
     const [msg, setMsg] = useState<boolean | undefined>(location.state?.deleted);
 
@@ -60,6 +72,10 @@ function HomePage() {
     }, [])
 
     // TODO create loader
+
+    function handleSortPrice(e) {
+        setSortParam(e.target.value);
+    }
 
     return (
         <Box sx={{my: '20px'}}>
@@ -81,8 +97,24 @@ function HomePage() {
                 <Grid item xs={12}>
                     <Search value={query} setQuery={setQuery}/>
                 </Grid>
+                <Grid item xs={12}>
+                    <FormControl fullWidth sx={{mb: 4}}>
+                        <InputLabel id="priceSortingLabel">Sort by price</InputLabel>
+                        <Select
+                            labelId="priceSortingLabel"
+                            id="priceSorting"
+                            value={sortParam}
+                            label="Sort by price"
+                            onChange={handleSortPrice}
+                        >
+                            <MenuItem value={''}>---</MenuItem>
+                            <MenuItem value={'asc'}>Ascending</MenuItem>
+                            <MenuItem value={'degitsc'}>Descending</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
                 <Grid item container spacing={2}>
-                    <ProductList products={products} query={query} />
+                    <ProductList products={products} query={query} sortParam={sortParam}/>
                 </Grid>
             </Grid>
         </Box>
