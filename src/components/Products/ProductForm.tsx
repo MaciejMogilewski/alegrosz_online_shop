@@ -14,26 +14,9 @@ import DropInput from '../DropInput/DropInput';
 import {useEffect, useState} from "react";
 import {useNavigate, NavigateFunction} from "react-router-dom";
 import {Product, ProductWithId} from "../../types/product";
+import {Category, CategoryApi, Subcategory} from "../../types/category";
 
 // [{id, category, subcategory: [{id, name}]}]
-
-interface Kind {
-    id: number;
-    name: string;
-}
-
-interface Subcategory {
-    id: number;
-    name: string;
-}
-
-interface Category extends Kind {
-    subcategories: Array<Subcategory | undefined>
-}
-
-interface CategoryApi extends Kind {
-    subcategories: number[];
-}
 
 async function getKind<T>(endpoint: string): Promise<T[]> {
     const response = await fetch(`/api/v1/${endpoint}`);

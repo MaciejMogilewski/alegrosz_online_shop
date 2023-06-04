@@ -1,3 +1,5 @@
+import {CategoryApi, Kind} from "./category";
+
 export interface Product {
     "name": string;
     "description": string;
@@ -11,3 +13,8 @@ export interface Product {
 }
 
 export type ProductWithId = Omit<Product, "id">
+
+export interface ProductWithCategories extends Omit<Product, 'category' | 'subcategory'> {
+    category: CategoryApi | undefined;
+    subcategory: Kind | undefined;
+}
