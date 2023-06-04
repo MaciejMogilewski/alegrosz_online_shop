@@ -2,17 +2,10 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import {
     Alert,
-    Button,
-    Card,
-    CardActions,
-    CardContent,
-    CardMedia,
-    Chip,
     FormControl,
-    InputLabel, MenuItem, Select,
-    Typography
+    InputLabel, MenuItem, Select, SelectChangeEvent
 } from "@mui/material";
-import {useLocation} from "react-router-dom"
+import {useLocation, useSearchParams} from "react-router-dom"
 import {useEffect, useState} from "react";
 import {Product, ProductWithCategories} from "../types/product";
 import {ApiType} from "../types/api";
@@ -55,9 +48,12 @@ async function getProductsWithCategories(signal: AbortSignal): Promise<ProductWi
 }
 
 function HomePage() {
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const [products, setProducts] = useState<ProductWithCategories[]>([]);
     const [query, setQuery] = useState('');
-    const [sortParam, setSortParam] = useState<string>('');
+    const [sortParam, setSortParam] = useState<string>(searchParams.get('sortBy') || '');
+
     const location = useLocation();
     const [msg, setMsg] = useState<boolean | undefined>(location.state?.deleted);
 
@@ -71,9 +67,21 @@ function HomePage() {
         }
     }, [])
 
+    useEffect(() => {
+        // TODO create query params for search products
+        const queryParams: { sortBy?: string } = {};
+
+        if (sortParam) {
+            queryParams.sortBy = sortParam
+        }
+
+        setSearchParams(queryParams);
+
+    }, [sortParam])
+
     // TODO create loader
 
-    function handleSortPrice(e) {
+    function handleSortPrice(e: SelectChangeEvent) {
         setSortParam(e.target.value);
     }
 
@@ -109,7 +117,7 @@ function HomePage() {
                         >
                             <MenuItem value={''}>---</MenuItem>
                             <MenuItem value={'asc'}>Ascending</MenuItem>
-                            <MenuItem value={'degitsc'}>Descending</MenuItem>
+                            <MenuItem value={'desc'}>Descending</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
