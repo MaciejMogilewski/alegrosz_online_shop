@@ -20,17 +20,6 @@
       "barcode": "2222",
       "category": 3,
       "subcategory": 8,
-      "id": 2
-    },
-    {
-      "name": "dupa",
-      "description": "jasna",
-      "price": 2,
-      "image": "",
-      "stockCount": 1,
-      "barcode": "2222",
-      "category": 3,
-      "subcategory": 8,
       "id": 3
     },
     {
@@ -43,6 +32,17 @@
       "category": 3,
       "subcategory": 8,
       "id": 4
+    },
+    {
+      "name": "dupa5",
+      "description": "dupa6",
+      "price": 111,
+      "image": "",
+      "stockCount": 11,
+      "barcode": "222222",
+      "category": 1,
+      "subcategory": 2,
+      "id": 5
     }
   ],
   "categories": [
