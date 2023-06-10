@@ -1,35 +1,14 @@
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import {
-    Alert,
-    FormControl,
-    InputLabel, MenuItem, Select, SelectChangeEvent
-} from "@mui/material";
+import {Alert, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
 import {useLocation, useSearchParams} from "react-router-dom"
 import {useEffect, useState} from "react";
 import {Product, ProductWithCategories} from "../types/product";
-import {ApiType} from "../types/api";
 import {CategoryApi, Subcategory} from "../types/category";
 import {Search} from "./Inputs/Search";
 import ProductList from "./Products/ProductList";
+import {getData} from "../src/api/api";
 
-
-async function getData<T>(
-    {
-        endpoint,
-        signal
-    }: ApiType
-): Promise<T[]> {
-    const init: { signal?: AbortSignal } = {};
-
-    if (signal !== undefined) {
-        init.signal = signal
-    }
-
-    const response = await fetch(`/api/v1/${endpoint}`, init)
-
-    return response.json();
-}
 
 async function getProductsWithCategories(signal: AbortSignal): Promise<ProductWithCategories[]> {
     const response: [Product[], CategoryApi[], Subcategory[]] = await Promise.all([

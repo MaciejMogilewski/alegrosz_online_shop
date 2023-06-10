@@ -1,6 +1,7 @@
 import {faker} from "@faker-js/faker";
 import {Button, Card, CardActions, CardContent, CardMedia, Chip, Grid, Typography} from "@mui/material";
 import {ProductWithCategories} from "../../types/product";
+import {Link} from "react-router-dom";
 
 type ProductItemProps = {
     product: ProductWithCategories
@@ -28,7 +29,9 @@ function ProductItem({product}: ProductItemProps) {
                     <Chip label={product.subcategory?.name} variant="outlined"/>
                 </CardContent>
                 <CardActions>
-                    <Button size="small">More info</Button>
+                    <Link to={`/products/${product.id}`}>
+                        <Button  size="small">More info</Button>
+                    </Link>
                 </CardActions>
             </Card>
         </Grid>
