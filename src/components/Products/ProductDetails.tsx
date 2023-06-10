@@ -1,11 +1,12 @@
 import {useParams, useNavigate} from "react-router-dom";
-import {Product, ProductWithCategoriesAndSubcategories} from "../../types/product";
-import {useContext, useEffect, useState} from "react";
+import {Product, ProductCart, ProductWithCategoriesAndSubcategories} from "../../types/product";
+import {ChangeEvent, useContext, useEffect, useState} from "react";
 import {Loader} from "../Feedback/Loader";
-import {Box, Button, Card, CardMedia, Grid, Paper, Typography} from "@mui/material";
+import {Box, Button, Card, CardMedia, Grid, Paper, TextField, Typography} from "@mui/material";
 import {faker} from "@faker-js/faker";
 import CategoriesContext from "../../context/CategoriesContext";
 import {Category} from "../../types/category";
+import {CartContext} from "../../context/CartContext";
 
 async function getProduct(endpoint: string, signal: AbortSignal): Promise<Product> {
     const response = await fetch(`/api/v1/${endpoint}`, {signal});
@@ -41,6 +42,9 @@ function ProductDetails() {
     const {id} = useParams();
     const [product, setProduct] = useState<ProductWithCategoriesAndSubcategories | null>(null);
     const categories = useContext(CategoriesContext);
+    const [cartProducts, setCartProducts] = useContext(CartContext);
+
+    const [quantity, setQuantity] = useState(1);
 
     const navigate = useNavigate();
 
@@ -69,6 +73,30 @@ function ProductDetails() {
                 deleted: true
             }
         });
+    }
+
+    function addToCart() {
+        if (!product) {
+            throw new Error('Product not found')
+        }
+
+        let cartProduct: ProductCart | undefined = cartProducts.find((cartProduct) => cartProduct.id === product.id);
+
+        if (cartProduct === undefined) {
+            cartProduct = {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: quantity
+            } as ProductCart
+
+            setCartProducts([...cartProducts, cartProduct])
+
+        } else {
+            cartProduct.quantity += quantity;
+
+            setCartProducts([...cartProducts])
+        }
     }
 
     if (!product) {
@@ -121,7 +149,16 @@ function ProductDetails() {
                                 <Typography variant="h4">
                                     Price: ${product.price}
                                 </Typography>
-                                <Button variant='contained'>Buy now!</Button>
+                                <TextField
+                                    id='quantity'
+                                    type='number'
+                                    label='Quantity'
+                                    value={quantity}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setQuantity(+e.target.value)}
+                                />
+                                <Button variant='contained' onClick={addToCart}>
+                                    Buy now!
+                                </Button>
                             </Paper>
                             <Paper style={{display: "flex", gap: 10, padding: 10}}>
                                 <Button variant="contained">
