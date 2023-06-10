@@ -1,10 +1,19 @@
 import {Typography} from "@mui/material";
+import {useContext} from "react";
+import {CartContext} from "../../context/CartContext";
+import {ProductCart} from "../../types/product";
 
 function CartTotal() {
+    const [cartProducts] = useContext(CartContext);
+
+    function calculateTotal(products: ProductCart[]): string {
+        return products.reduce((acc, ce) => acc + ce.price * ce.quantity, 0).toFixed(2)
+    }
+
     return (
         <>
             <Typography variant='subtitle2'>
-                Your cart is empty
+                {cartProducts.length > 0 ? `Total cost: $${calculateTotal(cartProducts)}` : 'Your cart is empty'}
             </Typography>
         </>
     );
