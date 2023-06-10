@@ -1,14 +1,32 @@
 import {useParams, useNavigate} from "react-router-dom";
-import {Product} from "../../types/product";
-import {useEffect, useState} from "react";
+import {Product, ProductWithCategoriesAndSubcategories} from "../../types/product";
+import {useContext, useEffect, useState} from "react";
 import {Loader} from "../Feedback/Loader";
 import {Box, Button, Card, CardMedia, Grid, Paper, Typography} from "@mui/material";
 import {faker} from "@faker-js/faker";
+import CategoriesContext from "../../context/CategoriesContext";
+import {Category} from "../../types/category";
 
 async function getProduct(endpoint: string, signal: AbortSignal): Promise<Product> {
     const response = await fetch(`/api/v1/${endpoint}`, {signal});
 
     return response.json();
+}
+
+function addCategoryNamesToProduct(product: Product, categories: Category[] | null): ProductWithCategoriesAndSubcategories {
+    const category = categories ? categories
+        .find((category) => category.id === product.category) : undefined;
+
+    if (category === undefined) {
+        throw new Error(`Cannot find category with id: ${product.category}`)
+    }
+
+    return {
+        ...product,
+        category,
+        subcategory: category.subcategories
+            .find((subcategory) => product.subcategory === subcategory?.id)
+    }
 }
 
 async function deleteProduct(endpoint: string): Promise<Record<string, never>> {
@@ -21,26 +39,27 @@ async function deleteProduct(endpoint: string): Promise<Record<string, never>> {
 
 function ProductDetails() {
     const {id} = useParams();
-    const [product, setProduct] = useState<Product | null>(null);
+    const [product, setProduct] = useState<ProductWithCategoriesAndSubcategories | null>(null);
+    const categories = useContext(CategoriesContext);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const controller = new AbortController()
 
-        if (id !== undefined) {
-            getProduct(`products/${id}`, controller.signal).then(setProduct);
-        } else {
-            // TODO create error boundary for this component
-            throw new Error(`Invalid query params id: ${id}`);
+        if (id !== undefined && categories) {
+            getProduct(`products/${id}`, controller.signal).then(
+                (product) => {
+                    setProduct(addCategoryNamesToProduct(product, categories));
+                }
+            );
         }
 
         return () => {
             controller.abort();
         }
 
-
-    }, [id]);
+    }, [categories, id]);
 
     async function handleDelete() {
         await deleteProduct(`products/${id}`);
@@ -66,9 +85,9 @@ function ProductDetails() {
                         {product.name}
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                        {product.category}/{product.subcategory}
+                        {product.category?.name}/{product.subcategory?.name}
                     </Typography>
-                    <Grid container spacing={2} xs={12}>
+                    <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <Card sx={{maxWidth: 645}}>
                                 <CardMedia
@@ -102,7 +121,7 @@ function ProductDetails() {
                                 <Typography variant="h4">
                                     Price: ${product.price}
                                 </Typography>
-                            <Button variant='contained'>Buy now!</Button>
+                                <Button variant='contained'>Buy now!</Button>
                             </Paper>
                             <Paper style={{display: "flex", gap: 10, padding: 10}}>
                                 <Button variant="contained">
