@@ -11,9 +11,11 @@ type ProductItemProps = {
     handleAddToWatchList: () => void;
     handleAddToCart: (product) => void
     handleCancelProduct: (product: ProductWithCart) => void;
+    category: string;
+    handleSelectCategory: (category: string) => void;
 }
 
-function ProductItem({product, handleAddToWatchList, handleAddToCart, handleCancelProduct}: ProductItemProps) {
+function ProductItem({product, handleAddToWatchList, handleAddToCart, handleCancelProduct, category, handleSelectCategory}: ProductItemProps) {
 
     function addToCartQuick() {
         handleAddToCart({
@@ -23,8 +25,6 @@ function ProductItem({product, handleAddToWatchList, handleAddToCart, handleCanc
             quantity: 1
         });
     }
-
-    console.log('magic')
 
     return (
         <Grid item xs={4}>
@@ -43,21 +43,25 @@ function ProductItem({product, handleAddToWatchList, handleAddToCart, handleCanc
                     <Chip label={`$${product.price}`} variant="filled"/>
                 </CardContent>
                 <CardContent>
-                    <Chip label={product.category?.name} variant="outlined" sx={{mr: 1}}/>
+                    <Chip
+                        label={product.category?.name}
+                        variant={category !== product?.category?.name ? 'outlined' : 'filled'}
+                        sx={{mr: 1}}
+                        onClick={() => handleSelectCategory(product?.category?.name || '')}/>
                     <Chip label={product.subcategory?.name} variant="outlined"/>
                 </CardContent>
-                <CardActions style={{display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'stretch'}}>
-                    <Link to={`/products/${product.id}`}>
-                        <Button variant='contained' size="small">
-                            <Link to={`/products/${product.id}`} style={{color: 'inherit', textDecoration: 'none'}}>
-                                More info
-                            </Link>
-                        </Button>
-                    </Link>
+                <CardActions
+                    style={{display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'stretch'}}>
+                    <Button variant='contained' size="small">
+                        <Link to={`/products/${product.id}`} style={{color: 'inherit', textDecoration: 'none'}}>
+                            More info
+                        </Link>
+                    </Button>
                     <Button variant='contained' color='success' size='small' onClick={addToCartQuick}>
                         Buy!
                     </Button>
                     <Button variant='contained' color='secondary' size='small' onClick={handleAddToWatchList}>
+                        {/*TODO create unwatch*/}
                         + Watch
                     </Button>
                     {product.isInCart && (

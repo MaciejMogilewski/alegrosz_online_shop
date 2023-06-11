@@ -1,20 +1,23 @@
 import {memo, useCallback, useContext, useEffect, useState} from "react";
 
-import {Grid, Typography} from "@mui/material";
+import {Button, Grid, Typography} from "@mui/material";
 
 import {ProductCart, ProductWithCart} from "../../types/product";
 import ProductItem from "./ProductItem";
 import {CartContext} from "../../context/CartContext";
 import {LocalStorageValue} from "../../types/localStorage";
 import {getProductsWithCategories} from "../../api/api";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 type ProductListProps = {
     query: string;
     sortParam: string;
+    category: string;
+    setCategory: (value: string) => void;
 }
 
-function ProductList({query, sortParam}: ProductListProps) {
-    const [watchList, setWatchList] = useState<number>(0);
+function ProductList({query, sortParam, category, setCategory}: ProductListProps) {
+    const [watchList, setWatchList] = useLocalStorage<number>('watchList', 0);
     const [cartProducts, setCartProducts] = useContext(CartContext);
     const [products, setProducts] = useState<ProductWithCart[]>([]);
 
@@ -42,11 +45,11 @@ function ProductList({query, sortParam}: ProductListProps) {
 
             return product;
         }));
-    }, [cartProducts]);
+    },[cartProducts]);
 
     const handleAddToWatchList = useCallback(function () {
-        setWatchList((prevState) => prevState + 1);
-    }, []);
+        setWatchList((prevState) => prevState !== undefined ? prevState + 1 : 1);
+    },[setWatchList]);
 
     const handleAddToCart = useCallback(function (product: ProductCart) {
         setCartProducts((prevState: LocalStorageValue<ProductCart[]> | undefined): LocalStorageValue<ProductCart[]> => {
@@ -86,19 +89,28 @@ function ProductList({query, sortParam}: ProductListProps) {
 
             return updatedCart;
         });
-    }, []);
+    },[setCartProducts]);
+
+    const handleSelectCategory = useCallback(function (category: string) {
+        setCategory(category)
+    }, [setCategory])
 
     return (
         <>
-            <Grid item xs={12}>
-                <Typography>
-                    Watched products: {watchList}
-                </Typography>
-            </Grid>
+            {watchList !== 0 && (
+                <Grid item xs={12}>
+                    <Typography>
+                        Watched products: {watchList}
+                    </Typography>
+                    <Button variant='contained' onClick={() => setWatchList(0)}>
+                        Clear Watchlist
+                    </Button>
+                </Grid>
+            )}
             {products
                 .filter((product) => `${product.name} ${product.description}`
                     .toLowerCase()
-                    .includes(query.toLowerCase())
+                    .includes(query.toLowerCase()) && (product?.category?.name === category || category === '')
                 )
                 .sort((a, b) => {
                     if (sortParam === 'asc') {
@@ -119,6 +131,8 @@ function ProductList({query, sortParam}: ProductListProps) {
                         handleAddToWatchList={handleAddToWatchList}
                         handleAddToCart={handleAddToCart}
                         handleCancelProduct={handleCancelProduct}
+                        category={category}
+                        handleSelectCategory={handleSelectCategory}
                     />
                 ))
             }
