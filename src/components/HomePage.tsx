@@ -1,4 +1,4 @@
-import {memo, useContext, useEffect, useState} from "react";
+import {ChangeEvent, memo, useContext, useEffect, useState} from "react";
 import {useLocation, useSearchParams} from "react-router-dom"
 
 import Grid from "@mui/material/Grid";
@@ -33,11 +33,11 @@ function HomePage() {
     }, [setSearchParams, sortParam])
 
     // TODO create loader
-    function handleSortPrice(e: SelectChangeEvent) {
+    function handleSortPrice(e: ChangeEvent<HTMLSelectElement>) {
         setSortParam(e.target.value);
     }
 
-    function handleFilterCategory(e: SelectChangeEvent) {
+    function handleFilterCategory(e: ChangeEvent<HTMLSelectElement>) {
         setCategory(e.target.value);
     }
 
