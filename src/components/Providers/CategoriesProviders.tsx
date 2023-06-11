@@ -1,8 +1,9 @@
 import {PropsWithChildren, useEffect, useState} from "react";
 import CategoriesContext from "../../context/CategoriesContext"
 import {Category, CategoryApi, Subcategory} from "../../types/category";
+import {getData} from "../../api/api";
 
-import {getData} from "../../src/api/api";
+
 
 async function getCategoriesAndSubcategories(signal: AbortSignal): Promise<Category[]> {
     const response: [CategoryApi[], Subcategory[]] = await Promise.all([

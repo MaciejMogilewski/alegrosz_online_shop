@@ -1,6 +1,24 @@
 import {Product, ProductWithCart} from "../types/product";
 import {CategoryApi, Subcategory} from "../types/category";
-import {getData} from "../src/api/api";
+
+import {ApiType} from "../types/api";
+
+export async function getData<T>(
+    {
+        endpoint,
+        signal
+    }: ApiType
+): Promise<T[]> {
+    const init: { signal?: AbortSignal } = {};
+
+    if (signal !== undefined) {
+        init.signal = signal
+    }
+
+    const response = await fetch(`/api/v1/${endpoint}`, init)
+
+    return response.json();
+}
 
 export async function getProductsWithCategories(signal: AbortSignal): Promise<ProductWithCart[]> {
     const response: [Product[], CategoryApi[], Subcategory[]] = await Promise.all([

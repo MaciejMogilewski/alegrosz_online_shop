@@ -9,10 +9,11 @@ import {ProductWithCart} from "../../types/product";
 type ProductItemProps = {
     product: ProductWithCart;
     handleAddToWatchList: () => void;
-    handleAddToCart: (product) => void;
+    handleAddToCart: (product) => void
+    handleCancelProduct: (product: ProductWithCart) => void;
 }
 
-function ProductItem({product, handleAddToWatchList, handleAddToCart}: ProductItemProps) {
+function ProductItem({product, handleAddToWatchList, handleAddToCart, handleCancelProduct}: ProductItemProps) {
 
     function addToCartQuick() {
         handleAddToCart({
@@ -24,23 +25,6 @@ function ProductItem({product, handleAddToWatchList, handleAddToCart}: ProductIt
     }
 
     console.log('magic')
-
-    function cancelProduct() {
-        // const updatedCart: ProductCart[] = [];
-        //
-        // for (const cartProduct of cartProducts || []) {
-        //     if (cartProduct.id !== product.id) {
-        //         updatedCart.push(cartProduct);
-        //     } else {
-        //         if (cartProduct.quantity > 1) {
-        //             cartProduct.quantity -= 1;
-        //             updatedCart.push(cartProduct);
-        //         }
-        //     }
-        // }
-        //
-        // setCartProducts(updatedCart);
-    }
 
     return (
         <Grid item xs={4}>
@@ -62,18 +46,24 @@ function ProductItem({product, handleAddToWatchList, handleAddToCart}: ProductIt
                     <Chip label={product.category?.name} variant="outlined" sx={{mr: 1}}/>
                     <Chip label={product.subcategory?.name} variant="outlined"/>
                 </CardContent>
-                <CardActions style={{display: 'flex', justifyContent: 'space-between'}}>
+                <CardActions style={{display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'stretch'}}>
                     <Link to={`/products/${product.id}`}>
-                        <Button variant='contained' size="small" sx={{mr: 1}}>More info</Button>
+                        <Button variant='contained' size="small">
+                            <Link to={`/products/${product.id}`} style={{color: 'inherit', textDecoration: 'none'}}>
+                                More info
+                            </Link>
+                        </Button>
                     </Link>
                     <Button variant='contained' color='success' size='small' onClick={addToCartQuick}>
-                        Quick buy!
+                        Buy!
                     </Button>
                     <Button variant='contained' color='secondary' size='small' onClick={handleAddToWatchList}>
-                        Add to Watch List
+                        + Watch
                     </Button>
                     {product.isInCart && (
-                        <Button variant='contained' color='warning' onClick={cancelProduct}>
+                        <Button variant='contained' color='warning' onClick={() => {
+                            handleCancelProduct(product)
+                        }}>
                             Undo
                         </Button>
                     )}
