@@ -1,35 +1,50 @@
+import {memo, useContext} from "react";
+import {Link} from "react-router-dom";
+
 import {faker} from "@faker-js/faker";
 import {Button, Card, CardActions, CardContent, CardMedia, Chip, Grid, Typography} from "@mui/material";
-import {ProductCart, ProductWithCategories} from "../../types/product";
-import {Link} from "react-router-dom";
-import {useContext} from "react";
-import {CartContext} from "../../context/CartContext";
+
+import {ProductWithCategories} from "../../types/product";
 
 type ProductItemProps = {
-    product: ProductWithCategories
+    product: ProductWithCategories;
+    handleAddToWatchList: () => void;
+    handleAddToCart: (product) => void;
 }
 
-function ProductItem({product}: ProductItemProps) {
-    const [cartProducts, setCartProducts] = useContext(CartContext);
+function ProductItem({product, handleAddToWatchList, handleAddToCart}: ProductItemProps) {
 
     function addToCartQuick() {
-        let cartProduct: ProductCart | undefined = cartProducts.find((cartProduct) => cartProduct.id === product.id);
+        handleAddToCart({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: 1
+        });
+    }
 
-        if (cartProduct === undefined) {
-            cartProduct = {
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                quantity: 1
-            } as ProductCart
+    function isInCart(): boolean {
+        return false;
+        // return cartProducts !== undefined ? cartProducts.some(({id}) => id === product.id) : false;
+    }
 
-            setCartProducts([...cartProducts, cartProduct])
+    console.log('magic')
 
-        } else {
-            cartProduct.quantity += 1;
-
-            setCartProducts([...cartProducts])
-        }
+    function cancelProduct() {
+        // const updatedCart: ProductCart[] = [];
+        //
+        // for (const cartProduct of cartProducts || []) {
+        //     if (cartProduct.id !== product.id) {
+        //         updatedCart.push(cartProduct);
+        //     } else {
+        //         if (cartProduct.quantity > 1) {
+        //             cartProduct.quantity -= 1;
+        //             updatedCart.push(cartProduct);
+        //         }
+        //     }
+        // }
+        //
+        // setCartProducts(updatedCart);
     }
 
     return (
@@ -54,15 +69,25 @@ function ProductItem({product}: ProductItemProps) {
                 </CardContent>
                 <CardActions style={{display: 'flex', justifyContent: 'space-between'}}>
                     <Link to={`/products/${product.id}`}>
-                        <Button variant='contained' size="small">More info</Button>
+                        <Button variant='contained' size="small" sx={{mr: 1}}>More info</Button>
                     </Link>
                     <Button variant='contained' color='success' size='small' onClick={addToCartQuick}>
                         Quick buy!
                     </Button>
+                    <Button variant='contained' color='secondary' size='small' onClick={handleAddToWatchList}>
+                        Add to Watch List
+                    </Button>
+                    {isInCart() && (
+                        <Button variant='contained' color='warning' onClick={cancelProduct}>
+                            Undo
+                        </Button>
+                    )}
                 </CardActions>
             </Card>
         </Grid>
     );
 }
 
-export default ProductItem;
+const ProductItemMemoized = memo(ProductItem);
+
+export default ProductItemMemoized;

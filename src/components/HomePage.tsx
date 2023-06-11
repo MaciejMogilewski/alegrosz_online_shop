@@ -1,8 +1,10 @@
+import {memo, useEffect, useState} from "react";
+import {useLocation, useSearchParams} from "react-router-dom"
+
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import {Alert, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
-import {useLocation, useSearchParams} from "react-router-dom"
-import {useEffect, useState} from "react";
+
 import {Product, ProductWithCategories} from "../types/product";
 import {CategoryApi, Subcategory} from "../types/category";
 import {Search} from "./Inputs/Search";
@@ -108,4 +110,6 @@ function HomePage() {
     );
 }
 
-export default HomePage;
+const HomePageMemoized = memo(HomePage)
+
+export default HomePageMemoized;
