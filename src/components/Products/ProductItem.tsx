@@ -1,13 +1,13 @@
-import {memo, useContext} from "react";
+import {memo} from "react";
 import {Link} from "react-router-dom";
 
 import {faker} from "@faker-js/faker";
 import {Button, Card, CardActions, CardContent, CardMedia, Chip, Grid, Typography} from "@mui/material";
 
-import {ProductWithCategories} from "../../types/product";
+import {ProductWithCart} from "../../types/product";
 
 type ProductItemProps = {
-    product: ProductWithCategories;
+    product: ProductWithCart;
     handleAddToWatchList: () => void;
     handleAddToCart: (product) => void;
 }
@@ -21,11 +21,6 @@ function ProductItem({product, handleAddToWatchList, handleAddToCart}: ProductIt
             price: product.price,
             quantity: 1
         });
-    }
-
-    function isInCart(): boolean {
-        return false;
-        // return cartProducts !== undefined ? cartProducts.some(({id}) => id === product.id) : false;
     }
 
     console.log('magic')
@@ -77,7 +72,7 @@ function ProductItem({product, handleAddToWatchList, handleAddToCart}: ProductIt
                     <Button variant='contained' color='secondary' size='small' onClick={handleAddToWatchList}>
                         Add to Watch List
                     </Button>
-                    {isInCart() && (
+                    {product.isInCart && (
                         <Button variant='contained' color='warning' onClick={cancelProduct}>
                             Undo
                         </Button>

@@ -1,21 +1,44 @@
-import {memo, useCallback, useContext, useState} from "react";
+import {memo, useCallback, useContext, useEffect, useState} from "react";
 
 import {Grid, Typography} from "@mui/material";
 
-import {ProductCart, ProductWithCategories} from "../../types/product";
+import {ProductCart, ProductWithCart} from "../../types/product";
 import ProductItem from "./ProductItem";
 import {CartContext} from "../../context/CartContext";
 import {LocalStorageValue} from "../../types/localStorage";
+import {getProductsWithCategories} from "../../api/api";
 
 type ProductListProps = {
-    products: ProductWithCategories[];
     query: string;
     sortParam: string;
 }
 
-function ProductList({products, query, sortParam}: ProductListProps) {
+function ProductList({query, sortParam}: ProductListProps) {
     const [watchList, setWatchList] = useState<number>(0);
     const [cartProducts, setCartProducts] = useContext(CartContext);
+    const [products, setProducts] = useState<ProductWithCart[]>([]);
+
+    useEffect(() => {
+
+        const controller = new AbortController();
+        getProductsWithCategories(controller.signal).then(setProducts);
+
+        return () => {
+            controller.abort();
+        }
+    }, [])
+
+    useEffect(() => {
+        setProducts(products.map((product) => {
+            if (product?.isInCart) {
+                return product;
+            } else if (cartProducts && cartProducts.some(({id}) => id === product.id)) {
+                return {...product, isInCart: true};
+            }
+
+            return product;
+        }));
+    }, [cartProducts])
 
     const handleAddToWatchList = useCallback(function () {
         setWatchList((prevState) => prevState + 1);

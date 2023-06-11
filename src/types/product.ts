@@ -19,6 +19,10 @@ export interface ProductWithCategories extends Omit<Product, 'category' | 'subca
     subcategory: Kind | undefined;
 }
 
+export interface ProductWithCart extends ProductWithCategories {
+    isInCart?: boolean;
+}
+
 export interface ProductWithCategoriesAndSubcategories extends Omit<ProductWithCategories, 'category'> {
     category: Category | undefined;
 }
