@@ -1,10 +1,11 @@
-import {PropsWithChildren, useState} from "react";
+import {PropsWithChildren} from "react";
 import {ProductCart} from "../../types/product";
 import {CartContext} from "../../context/CartContext"
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 
 function CartProvider({children}: PropsWithChildren) {
-    const cart = useState<ProductCart[]>([]);
+    const cart = useLocalStorage<ProductCart[]>('cart', []);
 
     return (
         <CartContext.Provider value={cart}>

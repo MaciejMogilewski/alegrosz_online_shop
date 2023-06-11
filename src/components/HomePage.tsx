@@ -56,7 +56,7 @@ function HomePage() {
 
         setSearchParams(queryParams);
 
-    }, [sortParam])
+    }, [setSearchParams, sortParam])
 
     // TODO create loader
 

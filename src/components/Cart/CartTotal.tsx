@@ -13,7 +13,7 @@ function CartTotal() {
     return (
         <>
             <Typography variant='subtitle2'>
-                {cartProducts.length > 0 ? `Total cost: $${calculateTotal(cartProducts)}` : 'Your cart is empty'}
+                {cartProducts && cartProducts.length > 0 ? `Total cost: $${calculateTotal(cartProducts)}` : 'Your cart is empty'}
             </Typography>
         </>
     );
